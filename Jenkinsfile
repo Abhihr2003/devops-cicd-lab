@@ -7,9 +7,9 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "devops-cicd-lab"
+        IMAGE_NAME = "calculator"
         IMAGE_TAG  = "${env.BUILD_NUMBER}"
-        CONTAINER_NAME = "devops-cicd-lab-container"
+        CONTAINER_NAME = "calculator-cont"
         DOCKERHUB_CREDS = credentials('dockerhub-creds') // configured in Jenkins credentials store
         DOCKERHUB_REPO  = "shek07/devops-cicd-lab"
     }
@@ -50,7 +50,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                    dockerImage = docker.build("${calculator}:${latest}")
                 }
             }
         }
@@ -58,11 +58,11 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    sh "echo ${DOCKERHUB_CREDS_PSW} | docker login -u ${DOCKERHUB_CREDS_USR} --password-stdin"
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_REPO}:${IMAGE_TAG}"
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_REPO}:latest"
-                    sh "docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}"
-                    sh "docker push ${DOCKERHUB_REPO}:latest"
+                    sh "echo ${Shek@2003} | docker login -u ${shek07} --password-stdin"
+                    sh "docker tag ${calculator}:${latest} ${calculator}:${latest}"
+                    sh "docker tag ${calculator}:${latest} ${calculator}:latest"
+                    sh "docker push ${calculator}:${latest}"
+                    sh "docker push ${calculator}:latest"
                 }
             }
         }
@@ -70,8 +70,8 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 sh """
-                    docker rm -f ${CONTAINER_NAME} || true
-                    docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${IMAGE_NAME}:${IMAGE_TAG}
+                    docker rm -f ${calculator-cont} || true
+                    docker run -d --name ${calculator-cont} -p 8080:8080 ${calculator}:${latest}
                 """
             }
         }
